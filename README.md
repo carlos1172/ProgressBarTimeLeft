@@ -6,3 +6,5 @@ Note: it says studied 637 cards in 1.36 hours today (7.67 s/card) but that's not
 I have not tested this on any other version besides 2.1.49, but I just wanted to share it since it took me a while to get this working and I'm very proud of it (and am hugely thankful to Glutanimate and Mr. Duarte).  
 
 Installation: Unzip them and paste them in C:\%APPDATA%\Anki2\addons21
+
+P.S. This is my first time using GitHub and Anki-Web, so please be kind :(
