@@ -1,0 +1,20 @@
+{
+	"includeNew": "True",
+	"includeRev": "True",
+	"includeLrn": "True",
+	"includeNewAfterRevs": "True",
+	"newWeight": "4",
+	"revWeight": "1",
+	"lrnWeight": "1",
+	"forceForward": "",
+	"qtxt": "aliceblue",
+	"qbg": "rgba(0, 0, 0, 0)",
+	"qfg": "#3399cc",
+	"qbr": "5",
+	"maxWidth": "20",
+	"scrollingBarWhenEditing": "True",
+	"invertTF": "",
+	"showPercent": "True",
+	"showNumber": "True",
+	"tz": "8"
+}
