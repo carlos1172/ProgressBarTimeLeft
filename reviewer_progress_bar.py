@@ -334,9 +334,9 @@ def updatePB() -> None:
             percent = 100 if total == 0 else (100 * cards / total)
             diff = int(pbMax - pbValue)
             percentdiff = (100-percent)
-            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, diff, percentdiff, secspeed, x, y, secs, hrhr, hrmin, hrsec, ETA))
+            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
         else:
-            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, diff, secspeed, x, y, secs, hrhr, hrmin, hrsec, ETA))
+            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, diff, secspeed, x, y, hrhr, hrmin, ETA))
     nmApplyStyle()
 
 def setScrollingPB() -> None:
