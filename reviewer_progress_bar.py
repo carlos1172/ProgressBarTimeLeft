@@ -134,7 +134,6 @@ totalCount = {}  # {did: max total count (weighted) that was seen}, calculated a
 # NOTE: did stands for 'deck id'
 # For old API of deckDueList(), these counts don't include cards in children decks. For new deck_due_tree(), they do.
 
-
 currDID: Optional[int] = None  # current deck id (None means at the deck browser)
 
 nmStyleApplied = 0
@@ -174,10 +173,6 @@ try:
     '''
 except ImportError:
     nmUnavailable = 1
-
-useOldAnkiAPI = anki_version.startswith("2.0.") or (
-            anki_version.startswith("2.1.") and int(anki_version.split(".")[-1]) < 28)
-
 
 def initPB() -> None:
     """Initialize and set parameters for progress bar, adding it to the dock."""
@@ -255,7 +250,7 @@ def updatePB() -> None:
         lrn += tree[3]
         due += tree[2]
 
-    total = (newWeight*new) + lrn + due
+    total = (newWeight*new) + (lrn*lrnWeight) + (due*revWeight)
     
     #total = new + lrn + due
 
@@ -288,55 +283,32 @@ def updatePB() -> None:
     date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
     date_time_24H = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
     ETA = date_time_24H.strftime("%I:%M %p")
-    
+      
     """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
-    if useOldAnkiAPI:
-        # With old API, counts don't include cards in child decks
-        if currDID:  # in a specific deck
-            deckName = mw.col.decks.name(currDID)
-            pbMax = pbValue = 0
-            # Sum up all children decks
-            for deckProp in mw.col.sched.deckDueList():
-                name = deckProp[0]
-                did = deckProp[1]
-                if name.startswith(deckName):
-                    pbMax += totalCount[did]
-                    pbValue += doneCount[did]
-        else:  # at desk browser
-            pbMax = sum(totalCount.values())
-            pbValue = sum(doneCount.values())
-    else:
-        # With new API, counts include cards in child decks
-        if currDID:  # in a specific deck
-            pbMax = pbValue = 0
-            # Sum top-level decks
-            for node in mw.col.sched.deck_due_tree().children:
-                pbMax += totalCount[node.deck_id]
-                pbValue += doneCount[node.deck_id]
-        else:  # at desk browser
-            pbMax = pbValue = 0
-            # Sum top-level decks
-            for node in mw.col.sched.deck_due_tree().children:
-                pbMax += totalCount[node.deck_id]
-                pbValue += doneCount[node.deck_id]
+    pbMax = pbValue = 0
+    # Sum top-level decks
+    for node in mw.col.sched.deck_due_tree().children:
+        pbMax += totalCount[node.deck_id]
+        pbValue += doneCount[node.deck_id]
 
     # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
-
+    var_diff = int(pbMax - pbValue)
+    progbarmax=var_diff+cards
+    
     if total == 0:  # 100%
         progressBar.setRange(0, 1)
         progressBar.setValue(1)
     else:
-        progressBar.setRange(0, total)
+        progressBar.setRange(0, progbarmax)
         progressBar.setValue(cards)
 
     if showNumber:
         if showPercent:
-            percent = 100 if total == 0 else (100 * cards / total)
-            diff = int(pbMax - pbValue)
+            percent = 100 if total == 0 else (100 * cards / progbarmax)
             percentdiff = (100-percent)
-            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
+            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
         else:
-            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, diff, secspeed, x, y, hrhr, hrmin, ETA))
+            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff, secspeed, x, y, hrhr, hrmin, ETA))
     nmApplyStyle()
 
 def setScrollingPB() -> None:
@@ -345,7 +317,6 @@ def setScrollingPB() -> None:
     if showNumber:
         progressBar.setFormat("Waiting...")
     nmApplyStyle()
-
 
 def nmApplyStyle() -> None:
     """Checks whether Night_Mode is disabled:
@@ -363,7 +334,6 @@ def nmApplyStyle() -> None:
     }
     ''')
 
-
 def calcProgress(rev: int, lrn: int, new: int) -> int:
     """Calculate progress using weights and card counts from the sched."""
     ret = 0
@@ -374,7 +344,6 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
     if includeNew or (includeNewAfterRevs and rev == 0):
         ret += new * newWeight
     return ret
-
 
 def updateCountsForAllDecks(updateTotal: bool) -> None:
     """
@@ -396,15 +365,8 @@ def updateCountsForAllDecks(updateTotal: bool) -> None:
     :param updateTotal: True for afterStateChange hook, False for showQuestion hook
     """
 
-    if useOldAnkiAPI:
-        for deckProp in mw.col.sched.deckDueList():
-            did = deckProp[1]
-            remain = calcProgress(deckProp[2], deckProp[3], deckProp[4])
-            updateCountsForDeck(did, remain, updateTotal)
-    else:
-        for node in mw.col.sched.deck_due_tree().children:
-            updateCountsForTree(node, updateTotal)
-
+    for node in mw.col.sched.deck_due_tree().children:
+        updateCountsForTree(node, updateTotal)
 
 def updateCountsForTree(node, updateTotal: bool) -> None:
     did = node.deck_id
@@ -414,7 +376,6 @@ def updateCountsForTree(node, updateTotal: bool) -> None:
 
     for child in node.children:
         updateCountsForTree(child, updateTotal)
-
 
 def updateCountsForDeck(did: int, remain: int, updateTotal: bool):
     if did not in totalCount.keys():
@@ -462,7 +423,6 @@ def showQuestionCallBack() -> None:
     # showInfo("updateCountsForAllDecks(False), currDID = %d" % (currDID if currDID else 0))
     updateCountsForAllDecks(False)  # see comments at updateCountsForAllDecks()
     updatePB()
-
 
 addHook("afterStateChange", afterStateChangeCallBack)
 addHook("showQuestion", showQuestionCallBack)
