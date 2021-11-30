@@ -241,7 +241,7 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     
 def updatePB() -> None:         
     """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
-    pbValue = 0
+    pbMax = pbValue = 0
     # Sum top-level decks
     for node in mw.col.sched.deck_due_tree().children:
         pbMax += totalCount[node.deck_id]
