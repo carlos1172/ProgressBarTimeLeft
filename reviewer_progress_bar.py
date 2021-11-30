@@ -246,7 +246,7 @@ def updatePB() -> None:
     for node in mw.col.sched.deck_due_tree().children:
         pbMax += totalCount[node.deck_id]
         pbValue += doneCount[node.deck_id]
-
+    
     # Get studdied cards
     cards, thetime = mw.col.db.first(
             """select count(), sum(time)/1000 from revlog where id > ?""",
@@ -254,10 +254,14 @@ def updatePB() -> None:
 
     cards   = cards or 0
     thetime = thetime or 0
-  
+    
+    # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
+    var_diff = int(pbMax - pbValue)
+    progbarmax=var_diff+cards
+    
     speed   = (cards / max(1, thetime))*60
     secspeed = max(1, thetime)/max(1, cards)
-    hr = (pbMax / max(1, speed))/60
+    hr = (var_diff / max(1, speed))/60
     
     x = math.floor(thetime/3600)
     y = math.floor((thetime-(x*3600))/60)
@@ -275,11 +279,7 @@ def updatePB() -> None:
     
     date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
     date_time_24H = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
-    ETA = date_time_24H.strftime("%I:%M %p")
-    
-    # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
-    var_diff = int(pbMax - pbValue)
-    progbarmax=var_diff+cards
+    ETA = date_time_24H.strftime("%I:%M %p")  
     
     if pbMax == 0:  # 100%
         progressBar.setRange(0, 1)
