@@ -239,20 +239,13 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     mw.web.setFocus()
     return dock
     
-def updatePB() -> None:   
-    # Get due and new cards
-    new = 0
-    lrn = 0
-    due = 0
-
-    for tree in mw.col.sched.deckDueTree():
-        new += tree[4]
-        lrn += tree[3]
-        due += tree[2]
-
-    total = (newWeight*new) + (lrn*lrnWeight) + (due*revWeight)
-    
-    #total = new + lrn + due
+def updatePB() -> None:         
+    """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
+    pbValue = 0
+    # Sum top-level decks
+    for node in mw.col.sched.deck_due_tree().children:
+        pbMax += totalCount[node.deck_id]
+        pbValue += doneCount[node.deck_id]
 
     # Get studdied cards
     cards, thetime = mw.col.db.first(
@@ -261,10 +254,10 @@ def updatePB() -> None:
 
     cards   = cards or 0
     thetime = thetime or 0
-        
+  
     speed   = (cards / max(1, thetime))*60
     secspeed = max(1, thetime)/max(1, cards)
-    hr = (total / max(1, speed))/60
+    hr = (pbMax / max(1, speed))/60
     
     x = math.floor(thetime/3600)
     y = math.floor((thetime-(x*3600))/60)
@@ -283,19 +276,12 @@ def updatePB() -> None:
     date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
     date_time_24H = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
     ETA = date_time_24H.strftime("%I:%M %p")
-      
-    """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
-    pbMax = pbValue = 0
-    # Sum top-level decks
-    for node in mw.col.sched.deck_due_tree().children:
-        pbMax += totalCount[node.deck_id]
-        pbValue += doneCount[node.deck_id]
-
+    
     # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
     var_diff = int(pbMax - pbValue)
     progbarmax=var_diff+cards
     
-    if total == 0:  # 100%
+    if pbMax == 0:  # 100%
         progressBar.setRange(0, 1)
         progressBar.setValue(1)
     else:
@@ -304,7 +290,7 @@ def updatePB() -> None:
 
     if showNumber:
         if showPercent:
-            percent = 100 if total == 0 else (100 * cards / progbarmax)
+            percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
             percentdiff = (100-percent)
             progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
         else:
