@@ -269,20 +269,20 @@ def updatePB() -> None:
         
     speed   = (cards / max(1, thetime))*60
     secspeed = max(1, thetime)/max(1, cards)
-    minutes = (total / max(1, speed))/60
+    hr = (total / max(1, speed))/60
     
-    x = (math.floor(thetime/3600))
-    y = (math.ceil((thetime-x)/60))
-    secs = (thetime-x-(y*60))
-    minuteshr = math.floor(minutes)
-    minutesmin = math.ceil((minutes*60)-(minuteshr*60))
-    minutessec = ((minutes-minuteshr)*60-minutesmin)*60
+    x = math.floor(thetime/3600)
+    y = math.floor((thetime-(x*3600))/60)
+    secs = (thetime-(x*3600))-(y*60)
+    hrhr = math.floor(hr)
+    hrmin = math.floor(60*(hr-hrhr))
+    hrsec = ((hr-hrhr)*60-hrmin)*60
     
     dt=datetime.today()
     tz = int(config['tz']) #GMT+ <CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)>
     tzsec = tz*3600
     
-    t = timedelta(hours = minuteshr, minutes = minutesmin, seconds = minutessec)
+    t = timedelta(hours = hrhr, minutes = hrmin, seconds = hrsec)
     left = dt.timestamp()+tzsec+t.total_seconds()
     
     date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
@@ -334,9 +334,9 @@ def updatePB() -> None:
             percent = 100 if total == 0 else (100 * cards / total)
             diff = int(pbMax - pbValue)
             percentdiff = (100-percent)
-            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, diff, percentdiff, secspeed, x, y, minuteshr, minutesmin, ETA))
+            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, diff, percentdiff, secspeed, x, y, secs, hrhr, hrmin, hrsec, ETA))
         else:
-            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, diff, secspeed, x, y, minuteshr, minutesmin, ETA))
+            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, diff, secspeed, x, y, secs, hrhr, hrmin, hrsec, ETA))
     nmApplyStyle()
 
 def setScrollingPB() -> None:
