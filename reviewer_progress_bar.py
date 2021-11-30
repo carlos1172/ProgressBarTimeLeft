@@ -29,19 +29,45 @@ import aqt
 from aqt import mw
 from aqt.utils import tooltip
 
+import math
+
+from aqt.qt import QAction
+from aqt import mw
+
+from datetime import datetime, timezone, timedelta, date
+import time
+
+import subprocess
+import os
+import platform
+
+import distutils
+
 __version__ = '2.0.1'
+
+#-------------Configuration------------------
+config = mw.addonManager.getConfig(__name__)
+# The default steps for "New" Anki cards are 1min and 10min meaning that you see New cards actually a minimum of *TWO* times that day
+# You can now configure how many times new cards will be counted.
+# CountTimesNew = 1 (old version)
+# Quantify '1' time the "new card" time | Example: Steps (10 1440)
+# CountTimesNew = 2 (default)
+# Quantify '2' times the "new card" time | Example: Steps (1 10)
+# CountTimesNew = n
+# Quantify 'n' times the "new card" time | Example: Steps (1 10 10 20 30...)
+#-------------Configuration------------------
 
 ############## USER CONFIGURATION START ##############
 
 # CARD TALLY CALCULATION
 
 # Which queues to include in the progress calculation (all True by default)
-includeNew = True
-includeRev = True
-includeLrn = True
+includeNew =  config['includeNew']
+includeRev = config['includeRev']
+includeLrn = config['includeLrn']
 
 # Only include new cards once reviews are exhausted.
-includeNewAfterRevs = True
+includeNewAfterRevs = config['includeNewAfterRevs']
 
 # Calculation weights
 #
@@ -66,36 +92,36 @@ includeNewAfterRevs = True
 #   disappear instantly after you learn one of them. However, all three cards will be regarded as 'completed,'
 #   so your progress may go three times as fast.
 
-newWeight = 4
-revWeight = 1
-lrnWeight = 1
+newWeight = int(config['newWeight'])
+revWeight = int(config['revWeight'])
+lrnWeight = int(config['lrnWeight'])
 
 # If enabled, the progress will freeze if remaining count has to increase to prevent moving backward,
 #   and wait until your correct answers 'make up' this additional part.
 #   NOTE: This will not stop the progress from moving backward if you add cards or toggle suspended.
-forceForward = False
+forceForward = bool(config['forceForward'])
 
 # PROGRESS BAR APPEARANCE
 
-showPercent = True  # Show the progress text percentage or not.
-showNumber = True  # Show the progress text as a fraction
+showPercent = bool(config['showPercent'])  # Show the progress text percentage or not.
+showNumber = bool(config['showNumber'])  # Show the progress text as a fraction
 
-qtxt = "aliceblue"  # Percentage color, if text visible.
-qbg = "rgba(0, 0, 0, 0)"  # Background color of progress bar.
-qfg = "#3399cc"  # Foreground color of progress bar.
-qbr = 0  # Border radius (> 0 for rounded corners).
+qtxt = config['qtxt']  # Percentage color, if text visible.
+qbg = config['qbg']  # Background color of progress bar.
+qfg = config['qfg']  # Foreground color of progress bar.
+qbr = int(config['qbr'])  # Border radius (> 0 for rounded corners).
 
 # optionally restricts progress bar width
-maxWidth = "20px"  # (e.g. "5px". default: "")
+maxWidth = int(config['maxWidth'])  # (e.g. "5px". default: "")
 
-scrollingBarWhenEditing = True  # Make the progress bar 'scrolling' when waiting to resume.
+scrollingBarWhenEditing = bool(config['scrollingBarWhenEditing'])  # Make the progress bar 'scrolling' when waiting to resume.
 
 orientationHV = Qt.Horizontal  # Show bar horizontally (side to side). Use with top/bottom dockArea.
 # orientationHV = Qt.Vertical # Show bar vertically (up and down). Use with right/left dockArea.
 
-invertTF = False  # If set to True, inverts and goes from right to left or top to bottom.
+invertTF = bool(config['invertTF'])  # If set to True, inverts and goes from right to left or top to bottom.
 
-dockArea = Qt.TopDockWidgetArea  # Shows bar at the top. Use with horizontal orientation.
+dockArea = Qt.TopDockWidgetArea # Shows bar at the top. Use with horizontal orientation.
 # dockArea = Qt.BottomDockWidgetArea # Shows bar at the bottom. Use with horizontal orientation.
 # dockArea = Qt.RightDockWidgetArea # Shows bar at right. Use with vertical orientation.
 # dockArea = Qt.LeftDockWidgetArea # Shows bar at left. Use with vertical orientation.
@@ -202,7 +228,7 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     dock.setObjectName("pbDock")
     dock.setWidget(pb)
     dock.setTitleBarWidget(tWidget)
-
+ 
     # Note: if there is another widget already in this dock position, we have to add ourself to the list
 
     # first check existing widgets
@@ -239,9 +265,8 @@ def updatePB() -> None:
         lrn += tree[3]
         due += tree[2]
 
-    #if newWeight == 0: newWeight = 2
     total = (newWeight*new) + lrn + due
-    totalDisplay = (newWeight*new) + lrn + due
+    
     #total = new + lrn + due
 
     # Get studdied cards
@@ -251,10 +276,28 @@ def updatePB() -> None:
 
     cards   = cards or 0
     thetime = thetime or 0
-
-    speed   = cards * 60 / max(1, thetime)
+        
+    speed   = (cards / max(1, thetime))*60
     secspeed = max(1, thetime)/max(1, cards)
-    minutes = int(total / max(1, speed))/60
+    minutes = (total / max(1, speed))/60
+    
+    x = (math.floor(thetime/3600))
+    y = (math.ceil((thetime-x)/60))
+    secs = (thetime-x-(y*60))
+    minuteshr = math.floor(minutes)
+    minutesmin = math.ceil((minutes*60)-(minuteshr*60))
+    minutessec = ((minutes-minuteshr)*60-minutesmin)*60
+    
+    dt=datetime.today()
+    tz = int(config['tz']) #GMT+ <CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)>
+    tzsec = tz*3600
+    
+    t = timedelta(hours = minuteshr, minutes = minutesmin, seconds = minutessec)
+    left = dt.timestamp()+tzsec+t.total_seconds()
+    
+    date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
+    date_time_24H = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
+    ETA = date_time_24H.strftime("%I:%M %p")
     
     """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
     if useOldAnkiAPI:
@@ -275,8 +318,11 @@ def updatePB() -> None:
     else:
         # With new API, counts include cards in child decks
         if currDID:  # in a specific deck
-            pbMax = totalCount[currDID]
-            pbValue = doneCount[currDID]
+            pbMax = pbValue = 0
+            # Sum top-level decks
+            for node in mw.col.sched.deck_due_tree().children:
+                pbMax += totalCount[node.deck_id]
+                pbValue += doneCount[node.deck_id]
         else:  # at desk browser
             pbMax = pbValue = 0
             # Sum top-level decks
@@ -286,21 +332,21 @@ def updatePB() -> None:
 
     # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
 
-    if pbMax == 0:  # 100%
+    if total == 0:  # 100%
         progressBar.setRange(0, 1)
         progressBar.setValue(1)
     else:
-        progressBar.setRange(0, pbMax)
-        progressBar.setValue(pbValue)
+        progressBar.setRange(0, total)
+        progressBar.setValue(cards)
 
     if showNumber:
         if showPercent:
-            percent = 100 if pbMax == 0 else (100 * pbValue / pbMax)
+            percent = 100 if total == 0 else (100 * cards / total)
             diff = int(pbMax - pbValue)
             percentdiff = (100-percent)
-            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %.02f hrs. more"  % (pbValue, percent, diff, percentdiff, secspeed, minutes))
+            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, diff, percentdiff, secspeed, x, y, minuteshr, minutesmin, ETA))
         else:
-            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %.02f hrs. more"  % (pbValue, diff, secspeed, minutes))
+            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, diff, secspeed, x, y, minuteshr, minutesmin, ETA))
     nmApplyStyle()
 
 def setScrollingPB() -> None:
