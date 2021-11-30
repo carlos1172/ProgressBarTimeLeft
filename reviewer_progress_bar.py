@@ -26,13 +26,9 @@ from aqt import mw
 import anki
 from anki.lang import _, ngettext
 import aqt
-from aqt import mw
 from aqt.utils import tooltip
 
 import math
-
-from aqt.qt import QAction
-from aqt import mw
 
 from datetime import datetime, timezone, timedelta, date
 import time
