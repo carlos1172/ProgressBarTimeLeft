@@ -37,12 +37,6 @@ from aqt import mw
 from datetime import datetime, timezone, timedelta, date
 import time
 
-import subprocess
-import os
-import platform
-
-import distutils
-
 __version__ = '2.0.1'
 
 #-------------Configuration------------------
