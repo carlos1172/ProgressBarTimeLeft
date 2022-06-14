@@ -16,27 +16,27 @@ Quantify 'n' times the "new card" time<br/>
 Example: Steps (1 10 10 20 30...)<br/>
 
 My Defaults:<br>
-	"includeNew": "True",<br>
-	"includeRev": "True",<br>
-	"includeLrn": "True",<br>
-	"includeNewAfterRevs": "True",<br>
 	"newWeight": "1.2",<br>
 	"revWeight": "1.1",<br>
 	"lrnWeight": "1.2",<br>
-	"forceForward": "",<br>
 	"qtxt": "aliceblue",<br>
 	"qbg": "rgba(0, 0, 0, 0)",<br>
 	"qfg": "#3399cc",<br>
 	"qbr": "5",<br>
 	"maxWidth": "20",<br>
-	"scrollingBarWhenEditing": "True",<br>
 	"orientationHV": "Qt.Horizontal",<br>
-	"invertTF": "",<br>
-	"showPercent": "True",<br>
-	"showNumber": "True"<br>
-    "showRetention": "True"<br>
 	"tz": 8 #GMT+ CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)<br>
 	
 Change the following in reviewer_progress_bar.py<br>
+"includeNew": "True",<br>
+"includeRev": "True",<br>
+"includeLrn": "True",<br>
+"includeNewAfterRevs": "True",<br>
+"scrollingBarWhenEditing": "True",<br>
+"invertTF": "",<br>
+"forceForward": "",<br>
+"showPercent": "True",<br>
+"showNumber": "True"<br>
+"showRetention": "True"<br>
 "dockArea": "Qt.TopDockWidgetArea"<br>
 "orientationHV": "Qt.Horizontal"
