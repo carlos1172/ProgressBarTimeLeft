@@ -20,9 +20,9 @@ My Defaults:<br>
 	"includeRev": "True",<br>
 	"includeLrn": "True",<br>
 	"includeNewAfterRevs": "True",<br>
-	"newWeight": "4",<br>
-	"revWeight": "1",<br>
-	"lrnWeight": "1",<br>
+	"newWeight": "1.2",<br>
+	"revWeight": "1.1",<br>
+	"lrnWeight": "1.2",<br>
 	"forceForward": "",<br>
 	"qtxt": "aliceblue",<br>
 	"qbg": "rgba(0, 0, 0, 0)",<br>
