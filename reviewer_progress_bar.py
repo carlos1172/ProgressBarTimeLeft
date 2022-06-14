@@ -82,9 +82,9 @@ includeNewAfterRevs = config['includeNewAfterRevs']
 #   disappear instantly after you learn one of them. However, all three cards will be regarded as 'completed,'
 #   so your progress may go three times as fast.
 
-newWeight = int(config['newWeight'])
-revWeight = int(config['revWeight'])
-lrnWeight = int(config['lrnWeight'])
+newWeight = float(config['newWeight'])
+revWeight = float(config['revWeight'])
+lrnWeight = float(config['lrnWeight'])
 
 # If enabled, the progress will freeze if remaining count has to increase to prevent moving backward,
 #   and wait until your correct answers 'make up' this additional part.
