@@ -34,6 +34,7 @@ My Defaults:<br>
 	"invertTF": "",<br>
 	"showPercent": "True",<br>
 	"showNumber": "True"<br>
+    "showRetention": "True"<br>
 	"tz": 8 #GMT+ CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)<br>
 	
 Change the following in reviewer_progress_bar.py<br>

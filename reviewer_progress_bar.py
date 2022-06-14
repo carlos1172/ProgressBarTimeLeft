@@ -33,7 +33,7 @@ import math
 from datetime import datetime, timezone, timedelta, date
 import time
 
-__version__ = '2.0.1'
+import anki.stats
 
 #-------------Configuration------------------
 config = mw.addonManager.getConfig(__name__)
@@ -52,12 +52,12 @@ config = mw.addonManager.getConfig(__name__)
 # CARD TALLY CALCULATION
 
 # Which queues to include in the progress calculation (all True by default)
-includeNew =  config['includeNew']
-includeRev = config['includeRev']
-includeLrn = config['includeLrn']
+includeNew =  1
+includeRev = 1
+includeLrn = 1
 
 # Only include new cards once reviews are exhausted.
-includeNewAfterRevs = config['includeNewAfterRevs']
+includeNewAfterRevs = 1
 
 # Calculation weights
 #
@@ -89,12 +89,13 @@ lrnWeight = float(config['lrnWeight'])
 # If enabled, the progress will freeze if remaining count has to increase to prevent moving backward,
 #   and wait until your correct answers 'make up' this additional part.
 #   NOTE: This will not stop the progress from moving backward if you add cards or toggle suspended.
-forceForward = bool(config['forceForward'])
+forceForward = 0
 
 # PROGRESS BAR APPEARANCE
 
-showPercent = bool(config['showPercent'])  # Show the progress text percentage or not.
-showNumber = bool(config['showNumber'])  # Show the progress text as a fraction
+showPercent = 1  # Show the progress text percentage or not.
+showRetention = 1  # Show the retention or not.
+showNumber = 1  # Show the progress text as a fraction
 
 qtxt = config['qtxt']  # Percentage color, if text visible.
 qbg = config['qbg']  # Background color of progress bar.
@@ -104,12 +105,12 @@ qbr = int(config['qbr'])  # Border radius (> 0 for rounded corners).
 # optionally restricts progress bar width
 maxWidth = int(config['maxWidth'])  # (e.g. "5px". default: "")
 
-scrollingBarWhenEditing = bool(config['scrollingBarWhenEditing'])  # Make the progress bar 'scrolling' when waiting to resume.
+scrollingBarWhenEditing = 1  # Make the progress bar 'scrolling' when waiting to resume.
 
 orientationHV = Qt.Horizontal  # Show bar horizontally (side to side). Use with top/bottom dockArea.
 # orientationHV = Qt.Vertical # Show bar vertically (up and down). Use with right/left dockArea.
 
-invertTF = bool(config['invertTF'])  # If set to True, inverts and goes from right to left or top to bottom.
+invertTF = 0  # If set to True, inverts and goes from right to left or top to bottom.
 
 dockArea = Qt.TopDockWidgetArea # Shows bar at the top. Use with horizontal orientation.
 # dockArea = Qt.BottomDockWidgetArea # Shows bar at the bottom. Use with horizontal orientation.
@@ -239,7 +240,31 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     mw.web.setFocus()
     return dock
     
-def updatePB() -> None:         
+def updatePB():
+    flunked, passed, passed_supermature, flunked_supermature, learned, relearned = mw.col.db.first("""
+    select
+    sum(case when ease = 1 and type == 1 then 1 else 0 end), /* flunked */
+    sum(case when ease > 1 and type == 1 then 1 else 0 end), /* passed */
+    sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* passed_supermature */
+    sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* flunked_supermature */
+    sum(case when ivl > 0 and type == 0 then 1 else 0 end), /* learned */
+    sum(case when ivl > 0 and type == 2 then 1 else 0 end) /* relearned */
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - 86400) * 1000)
+    flunked = flunked or 0
+    passed = passed or 0
+    passed_supermature = passed_supermature or 0
+    flunked_supermature = flunked_supermature or 0
+    learned = learned or 0
+    relearned = relearned or 0
+    try:
+        temp = "%0.1f%%" %(passed/float(passed+flunked)*100)
+    except ZeroDivisionError:
+        temp = "N/A"
+    try:
+        temp_supermature = "%0.1f%%" %(passed_supermature/float(passed_supermature+flunked_supermature)*100)
+    except ZeroDivisionError:
+        temp_supermature = "N/A"
+
     """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
     pbMax = pbValue = 0
     # Sum top-level decks
@@ -287,16 +312,24 @@ def updatePB() -> None:
     else:
         progressBar.setRange(0, progbarmax)
         progressBar.setValue(cards)
-
+    
     if showNumber:
-        if showPercent:
-            percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
-            percentdiff = (100-percent)
-            progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
+        if showRetention:
+            if showPercent:
+                percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                percentdiff = (100-percent)
+                progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s True Retention     |     %s S. Mature True Retention     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+            else:
+                progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s True Retention     |     %s S. Mature True Retention     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
         else:
-            progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff, secspeed, x, y, hrhr, hrmin, ETA))
+            if showPercent:
+                percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                percentdiff = (100-percent)
+                progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, x, y, hrhr, hrmin, ETA))
+            else:
+                progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, x, y, hrhr, hrmin, ETA))
     nmApplyStyle()
-
+    
 def setScrollingPB() -> None:
     """Make progress bar in waiting style if the state is resetRequired (happened after editing cards.)"""
     progressBar.setRange(0, 0)
