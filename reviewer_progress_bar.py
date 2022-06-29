@@ -239,23 +239,28 @@ def _dock(pb: QProgressBar) -> QDockWidget:
         mw.setPalette(palette)
     mw.web.setFocus()
     return dock
-    
-def updatePB():
-    flunked, passed, passed_supermature, flunked_supermature, learned, relearned = mw.col.db.first("""
+
+def updatePB():  
+    # Get studdied cards  and true retention stats
+    cards, flunked, passed, passed_supermature, flunked_supermature, learned, relearned, thetime = mw.col.db.first("""
     select
+    sum(case when ease >=1 then 1 else 0 end), /* cards */
     sum(case when ease = 1 and type == 1 then 1 else 0 end), /* flunked */
     sum(case when ease > 1 and type == 1 then 1 else 0 end), /* passed */
     sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* passed_supermature */
     sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* flunked_supermature */
     sum(case when ivl > 0 and type == 0 then 1 else 0 end), /* learned */
-    sum(case when ivl > 0 and type == 2 then 1 else 0 end) /* relearned */
+    sum(case when ivl > 0 and type == 2 then 1 else 0 end), /* relearned */
+    sum(time)/1000 /* thetime */
     from revlog where id > ? """,(mw.col.sched.dayCutoff - 86400) * 1000)
+    cards = cards or 0
     flunked = flunked or 0
     passed = passed or 0
     passed_supermature = passed_supermature or 0
     flunked_supermature = flunked_supermature or 0
     learned = learned or 0
     relearned = relearned or 0
+    thetime = thetime or 0
     try:
         temp = "%0.1f%%" %(passed/float(passed+flunked)*100)
     except ZeroDivisionError:
@@ -270,15 +275,7 @@ def updatePB():
     # Sum top-level decks
     for node in mw.col.sched.deck_due_tree().children:
         pbMax += totalCount[node.deck_id]
-        pbValue += doneCount[node.deck_id]
-    
-    # Get studdied cards
-    cards, thetime = mw.col.db.first(
-            """select count(), sum(time)/1000 from revlog where id > ?""",
-            (mw.col.sched.dayCutoff - 86400) * 1000)
-
-    cards   = cards or 0
-    thetime = thetime or 0
+        pbValue += doneCount[node.deck_id]  
     
     # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
     var_diff = int(pbMax - pbValue)
