@@ -96,6 +96,7 @@ forceForward = 0
 showPercent = 1  # Show the progress text percentage or not.
 showRetention = 1  # Show the retention or not.
 showAgain = 1 # Show again rate or not
+showSuperMatureRetention = 1
 showNumber = 1  # Show the progress text as a fraction
 
 qtxt = config['qtxt']  # Percentage color, if text visible.
@@ -316,36 +317,68 @@ def updatePB():
         progressBar.setValue(cards)
     
     if showNumber:
-        if showAgain:
-            if showRetention:
-                if showPercent:
-                    percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
-                    percentdiff = (100-percent)
-                    progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+        if showSuperMatureRetention:
+            if showAgain:
+                if showRetention:
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
                 else:
-                    progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %s True Retention     |     %s S. Mature True Retention     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, again, x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, x, y, hrhr, hrmin, ETA))
             else:
-                if showPercent:
-                    percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
-                    percentdiff = (100-percent)
-                    progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, again, x, y, hrhr, hrmin, ETA))
+                if showRetention:
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
                 else:
-                    progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, x, y, hrhr, hrmin, ETA))
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, x, y, hrhr, hrmin, ETA))  
         else:
-            if showRetention:
-                if showPercent:
-                    percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
-                    percentdiff = (100-percent)
-                    progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+            if showAgain:
+                if showRetention:
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %s TR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %s TR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, temp, , x, y, hrhr, hrmin, ETA))
                 else:
-                    progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, again, x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, x, y, hrhr, hrmin, ETA))
             else:
-                if showPercent:
-                    percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
-                    percentdiff = (100-percent)
-                    progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
+                if showRetention:
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s TR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, temp, x, y, hrhr, hrmin, ETA))
                 else:
-                    progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, x, y, hrhr, hrmin, ETA))  
+                    if showPercent:
+                        percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
+                        percentdiff = (100-percent)
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff, secspeed, x, y, hrhr, hrmin, ETA))
+                    else:
+                        progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, x, y, hrhr, hrmin, ETA)) 
     nmApplyStyle()
     
 def setScrollingPB() -> None:
