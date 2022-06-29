@@ -96,7 +96,6 @@ forceForward = 0
 showPercent = 1  # Show the progress text percentage or not.
 showRetention = 1  # Show the retention or not.
 showAgain = 1 # Show again rate or not
-showSuperMatureRetention = 1
 showNumber = 1  # Show the progress text as a fraction
 
 qtxt = config['qtxt']  # Percentage color, if text visible.
@@ -315,7 +314,12 @@ def updatePB():
     else:
         progressBar.setRange(0, progbarmax)
         progressBar.setValue(cards)
-    
+        
+    if temp_supermature in ['N/A']:
+        showSuperMatureRetention = 0
+    else:
+        showSuperMatureRetention = 1
+        
     if showNumber:
         if showSuperMatureRetention:
             if showAgain:
