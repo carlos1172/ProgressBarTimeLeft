@@ -269,6 +269,10 @@ def updatePB():
         temp_supermature = "%0.1f%%" %(passed_supermature/float(passed_supermature+flunked_supermature)*100)
     except ZeroDivisionError:
         temp_supermature = "N/A"
+    try:
+        again = "%0.1f%%" %(100-(passed+learned+relearned)/float(cards)*100)
+    except ZeroDivisionError:
+        again = "N/A"
 
     """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
     pbMax = pbValue = 0
@@ -315,7 +319,7 @@ def updatePB():
             if showPercent:
                 percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
                 percentdiff = (100-percent)
-                progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s True Retention     |     %s S. Mature True Retention     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+                progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s Again Rate     |     %s True Retention     |     %s S. Mature True Retention     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
             else:
                 progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s True Retention     |     %s S. Mature True Retention     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
         else:
