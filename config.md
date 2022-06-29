@@ -38,5 +38,6 @@ Change the following in reviewer_progress_bar.py<br>
 "showPercent": "True",<br>
 "showNumber": "True"<br>
 "showRetention": "True"<br>
+"showAgain": "True"<br>
 "dockArea": "Qt.TopDockWidgetArea"<br>
 "orientationHV": "Qt.Horizontal"
