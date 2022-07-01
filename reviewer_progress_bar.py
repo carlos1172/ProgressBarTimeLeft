@@ -95,6 +95,7 @@ forceForward = 0
 
 showPercent = 1  # Show the progress text percentage or not.
 showRetention = 1  # Show the retention or not.
+showSuperMatureRetention = 1 # Show Super Mature Retention
 showAgain = 1 # Show again rate or not
 showNumber = 1  # Show the progress text as a fraction
 
@@ -316,16 +317,6 @@ def updatePB():
     else:
         progressBar.setRange(0, progbarmax)
         progressBar.setValue(cards)
-    
-    if temp in ['N/A']:
-        showRetention = 0
-    else:
-        showRetention = 1
-    
-    if temp_supermature in ['N/A']:
-        showSuperMatureRetention = 0
-    else:
-        showSuperMatureRetention = 1
         
     if showNumber:
         if showSuperMatureRetention:
