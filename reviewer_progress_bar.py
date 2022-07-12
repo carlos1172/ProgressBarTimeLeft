@@ -82,9 +82,10 @@ includeNewAfterRevs = 1
 #   disappear instantly after you learn one of them. However, all three cards will be regarded as 'completed,'
 #   so your progress may go three times as fast.
 
-newWeight = float(config['newWeight'])
-revWeight = float(config['revWeight'])
-lrnWeight = float(config['lrnWeight'])
+# newWeight = float(config['newWeight'])
+# revWeight = float(config['revWeight'])
+# lrnWeight = float(config['lrnWeight'])
+lrnSteps = float(config['lrnSteps'])
 
 # If enabled, the progress will freeze if remaining count has to increase to prevent moving backward,
 #   and wait until your correct answers 'make up' this additional part.
@@ -277,7 +278,27 @@ def updatePB():
         again = "%0.1f%%" %((failed/cards)*100)
     except ZeroDivisionError:
         again = "N/A"
-
+    
+    """Calculate progress using weights and card counts from the sched."""
+    # Get studdied cards  and true retention stats
+    xcards, xfailed, xflunked, xpassed = mw.col.db.first("""
+    select
+    sum(case when ease >=1 then 1 else 0 end), /* xcards */
+    sum(case when ease = 1 then 1 else 0 end), /* xfailed */
+    sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
+    sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
+    xcards = xcards or 0.01
+    xfailed = xfailed or 0.01
+    xflunked = xflunked or 0.01
+    xpassed = xpassed or 0.01
+    
+    TR = 0.01 if 1-float(xpassed/(float(xpassed+xflunked))) == 0 else 1-float(xpassed/(float(xpassed+xflunked)))
+    xagain = 0.01 if float(xfailed/xcards) == 0 else float(xfailed/xcards) 
+    lrnWeight = float((1+(1*xagain*lrnSteps))/1)
+    newWeight = float((1+(1*xagain*lrnSteps))/1)
+    revWeight = float((1+(1*TR*lrnSteps))/1)
+    
     """Update progress bar range and value with currDID, totalCount[] and doneCount[]"""      
     pbMax = pbValue = 0
     # Sum top-level decks
@@ -408,6 +429,25 @@ def nmApplyStyle() -> None:
 
 def calcProgress(rev: int, lrn: int, new: int) -> int:
     """Calculate progress using weights and card counts from the sched."""
+    # Get studdied cards  and true retention stats
+    xcards, xfailed, xflunked, xpassed = mw.col.db.first("""
+    select
+    sum(case when ease >=1 then 1 else 0 end), /* xcards */
+    sum(case when ease = 1 then 1 else 0 end), /* xfailed */
+    sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
+    sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
+    xcards = xcards or 0.01
+    xfailed = xfailed or 0.01
+    xflunked = xflunked or 0.01
+    xpassed = xpassed or 0.01
+    
+    TR = 0.01 if 1-float(xpassed/(float(xpassed+xflunked))) == 0 else 1-float(xpassed/(float(xpassed+xflunked)))
+    xagain = 0.01 if float(xfailed/xcards) == 0 else float(xfailed/xcards) 
+    lrnWeight = float((1+(1*xagain*lrnSteps))/1)
+    newWeight = float((1+(1*xagain*lrnSteps))/1)
+    revWeight = float((1+(1*TR*lrnSteps))/1)
+    
     ret = 0
     if includeRev:
         ret += rev * revWeight

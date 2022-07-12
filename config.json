@@ -1,11 +1,1 @@
-{
-    "lrnWeight": "1.2",
-    "maxWidth": "20",
-    "newWeight": "1.25",
-    "qbg": "rgba(0, 0, 0, 0)",
-    "qbr": "5",
-    "qfg": "#3399cc",
-    "qtxt": "aliceblue",
-    "revWeight": "1.1",
-    "tz": "8"
-}
+{"qtxt":"aliceblue","tz":"8","qbr":"5","qfg":"#3399cc","maxWidth":"20","qbg":"rgba(0, 0, 0, 0)"}

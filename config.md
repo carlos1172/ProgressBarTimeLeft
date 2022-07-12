@@ -16,9 +16,6 @@ Quantify 'n' times the "new card" time<br/>
 Example: Steps (1 10 10 20 30...)<br/>
 
 My Defaults:<br>
-	"newWeight": "1.2",<br>
-	"revWeight": "1.1",<br>
-	"lrnWeight": "1.2",<br>
 	"qtxt": "aliceblue",<br>
 	"qbg": "rgba(0, 0, 0, 0)",<br>
 	"qfg": "#3399cc",<br>
