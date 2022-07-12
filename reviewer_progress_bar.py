@@ -293,8 +293,8 @@ def updatePB():
     xflunked = xflunked or 0.01
     xpassed = xpassed or 0.01
     
-    TR = 0.01 if 1-float(xpassed/(float(xpassed+xflunked))) == 0 else 1-float(xpassed/(float(xpassed+xflunked)))
-    xagain = 0.01 if float(xfailed/xcards) == 0 else float(xfailed/xcards) 
+    TR = 1-float(xpassed/(float(xpassed+xflunked)))
+    xagain = float(xfailed/xcards) 
     lrnWeight = float((1+(1*xagain*lrnSteps))/1)
     newWeight = float((1+(1*xagain*lrnSteps))/1)
     revWeight = float((1+(1*TR*lrnSteps))/1)
@@ -346,7 +346,7 @@ def updatePB():
                     if showPercent:
                         percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
                         percentdiff = (100-percent)
-                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s %.02f %.02f %.02f %.02f %.02f"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA, TR, xagain, newWeight, lrnWeight, revWeight))
                     else:
                         progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
                 else:
@@ -442,8 +442,8 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
     xflunked = xflunked or 0.01
     xpassed = xpassed or 0.01
     
-    TR = 0.01 if 1-float(xpassed/(float(xpassed+xflunked))) == 0 else 1-float(xpassed/(float(xpassed+xflunked)))
-    xagain = 0.01 if float(xfailed/xcards) == 0 else float(xfailed/xcards) 
+    TR = 1-float(xpassed/(float(xpassed+xflunked)))
+    xagain = float(xfailed/xcards) 
     lrnWeight = float((1+(1*xagain*lrnSteps))/1)
     newWeight = float((1+(1*xagain*lrnSteps))/1)
     revWeight = float((1+(1*TR*lrnSteps))/1)
