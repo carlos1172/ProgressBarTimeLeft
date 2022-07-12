@@ -287,7 +287,7 @@ def updatePB():
     sum(case when ease = 1 then 1 else 0 end), /* xfailed */
     sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
     sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400)) * 1000)
     xcards = xcards or 0.01
     xfailed = xfailed or 0.01
     xflunked = xflunked or 0.01
@@ -346,7 +346,7 @@ def updatePB():
                     if showPercent:
                         percent = 100 if pbMax == 0 else (100 * cards / progbarmax)
                         percentdiff = (100-percent)
-                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s %.02f %.02f %.02f %.02f %.02f"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA, TR, xagain, newWeight, lrnWeight, revWeight))
+                        progressBar.setFormat("%d (%.02f%%) done     |     %d (%.02f%%) left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, percent, var_diff, percentdiff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
                     else:
                         progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %s AR     |     %s TR     |     %s SMTR     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s"  % (cards, var_diff,  secspeed, again, temp, temp_supermature, x, y, hrhr, hrmin, ETA))
                 else:
@@ -436,7 +436,7 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
     sum(case when ease = 1 then 1 else 0 end), /* xfailed */
     sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
     sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400)) * 1000)
     xcards = xcards or 0.01
     xfailed = xfailed or 0.01
     xflunked = xflunked or 0.01
