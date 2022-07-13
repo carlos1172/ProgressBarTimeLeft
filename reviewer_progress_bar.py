@@ -287,7 +287,7 @@ def updatePB():
     sum(case when ease = 1 then 1 else 0 end), /* xfailed */
     sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
     sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400)) * 1000)
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
     xcards = xcards or 0.01
     xfailed = xfailed or 0.01
     xflunked = xflunked or 0.01
@@ -436,7 +436,7 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
     sum(case when ease = 1 then 1 else 0 end), /* xfailed */
     sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
     sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400)) * 1000)
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
     xcards = xcards or 0.01
     xfailed = xfailed or 0.01
     xflunked = xflunked or 0.01
