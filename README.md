@@ -7,4 +7,4 @@ Installation: Double click the anki-addon file or install the add-on from https:
 
 P.S. This is my first time using GitHub and Anki-Web, so please be kind :(
 
-Update June 14, 2022: added support for decimal card weights (learn weight, review weight, new weight). Redid configs. Added support for true retention statistics (adapted from True Retention add-on).
+Update see ankiwebs link for changelog
