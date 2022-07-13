@@ -256,7 +256,7 @@ def updatePB():
     sum(case when ivl > 0 and type == 0 then 1 else 0 end), /* learned */
     sum(case when ivl > 0 and type == 2 then 1 else 0 end), /* relearned */
     sum(time)/1000 /* thetime */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - 86400*2) * 1000)
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - 86400) * 1000)
     cards = cards or 0
     failed = failed or 0
     flunked = flunked or 0
