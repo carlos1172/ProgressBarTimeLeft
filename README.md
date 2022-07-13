@@ -8,3 +8,30 @@ Installation: Double click the anki-addon file or install the add-on from https:
 P.S. This is my first time using GitHub and Anki-Web, so please be kind :(
 
 Update see ankiwebs link for changelog
+
+## Configuration
+CHANGE ALL VALUES IN reviewer_progress_bar.py <br>
+<br>
+If True, write "True", otherwise leave it empty (e.g. "")<br>
+<br>
+Change the following in reviewer_progress_bar.py<br>
+"includeNew": "True",<br>
+"includeRev": "True",<br>
+"includeLrn": "True",<br>
+"includeNewAfterRevs": "True",<br>
+"scrollingBarWhenEditing": "True",<br>
+"invertTF": "",<br>
+"forceForward": "",<br>
+"showPercent": "True",<br>
+"showNumber": "True"<br>
+"showRetention": "True"<br>
+"showAgain": "True"<br>
+"dockArea": "Qt.TopDockWidgetArea"<br>
+"orientationHV": "Qt.Horizontal"
+"qtxt": "aliceblue",<br>
+"qbg": "rgba(0, 0, 0, 0)",<br>
+"qfg": "#3399cc",<br>
+"qbr": "5",<br>
+"maxWidth": "20",<br>
+"orientationHV": "Qt.Horizontal",<br>
+"tz": 8 #GMT+ CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)<br>
