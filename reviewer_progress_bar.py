@@ -85,7 +85,7 @@ includeNewAfterRevs = 1
 # newWeight = float(config['newWeight'])
 # revWeight = float(config['revWeight'])
 # lrnWeight = float(config['lrnWeight'])
-lrnSteps = float(config['lrnSteps'])
+lrnSteps = 3
 
 # If enabled, the progress will freeze if remaining count has to increase to prevent moving backward,
 #   and wait until your correct answers 'make up' this additional part.
@@ -100,13 +100,13 @@ showSuperMatureRetention = 1 # Show Super Mature Retention
 showAgain = 1 # Show again rate or not
 showNumber = 1  # Show the progress text as a fraction
 
-qtxt = config['qtxt']  # Percentage color, if text visible.
-qbg = config['qbg']  # Background color of progress bar.
-qfg = config['qfg']  # Foreground color of progress bar.
-qbr = int(config['qbr'])  # Border radius (> 0 for rounded corners).
+qtxt = "aliceblue"  # Percentage color, if text visible.
+qbg = "rgba(0, 0, 0, 0)"  # Background color of progress bar.
+qfg = "#3399cc"  # Foreground color of progress bar.
+qbr = 5  # Border radius (> 0 for rounded corners).
 
 # optionally restricts progress bar width
-maxWidth = int(config['maxWidth'])  # (e.g. "5px". default: "")
+maxWidth = 20  # (e.g. "5px". default: "")
 
 scrollingBarWhenEditing = 1  # Make the progress bar 'scrolling' when waiting to resume.
 
@@ -256,7 +256,7 @@ def updatePB():
     sum(case when ivl > 0 and type == 0 then 1 else 0 end), /* learned */
     sum(case when ivl > 0 and type == 2 then 1 else 0 end), /* relearned */
     sum(time)/1000 /* thetime */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - 86400) * 1000)
+    from revlog where id > ? """,(mw.col.sched.dayCutoff - 86400*2) * 1000)
     cards = cards or 0
     failed = failed or 0
     flunked = flunked or 0
@@ -322,7 +322,7 @@ def updatePB():
     hrsec = ((hr-hrhr)*60-hrmin)*60
     
     dt=datetime.today()
-    tz = int(config['tz']) #GMT+ <CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)>
+    tz = 8 #GMT+ <CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)>
     tzsec = tz*3600
     
     t = timedelta(hours = hrhr, minutes = hrmin, seconds = hrsec)
