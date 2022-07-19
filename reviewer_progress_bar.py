@@ -99,7 +99,7 @@ showRetention = 1  # Show the retention or not.
 showSuperMatureRetention = 1 # Show Super Mature Retention
 showAgain = 1 # Show again rate or not
 showNumber = 1  # Show the progress text as a fraction
-showTwoDay = 0 # Show 2-Day average value in parenthesis
+showYesterday = 1 # Show yesterday's values in parenthesis
 showDebug = 0 # Show New/Lrn/Rev Weights used for computation
 
 qtxt = "aliceblue"  # Percentage color, if text visible.
@@ -246,6 +246,9 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     return dock
 
 def updatePB():  
+    x = (mw.col.sched.dayCutoff-86400*2)*1000
+    y = (mw.col.sched.dayCutoff-86400)*1000
+    
     # Get studdied cards  and true retention stats
     cards, failed, flunked, passed, passed_supermature, flunked_supermature, learned, relearned, thetime = mw.col.db.first("""
     select
@@ -258,7 +261,7 @@ def updatePB():
     sum(case when ivl > 0 and type == 0 then 1 else 0 end), /* learned */
     sum(case when ivl > 0 and type == 2 then 1 else 0 end), /* relearned */
     sum(time)/1000 /* thetime */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - 86400) * 1000)
+    from revlog where id > ? """,y)
     cards = cards or 0
     failed = failed or 0
     flunked = flunked or 0
@@ -281,6 +284,10 @@ def updatePB():
     except ZeroDivisionError:
         again = "N/A"
     
+    dayCutoff = mw.col.sched.dayCutoff
+    x = (mw.col.sched.dayCutoff - 86400*2)*1000
+    y = (mw.col.sched.dayCutoff - 86400)*1000
+    
     """Calculate progress using weights and card counts from the sched."""
     # Get studdied cards  and true retention stats
     xcards, xfailed, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
@@ -292,7 +299,7 @@ def updatePB():
     sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xpassed_supermature */
     sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
     sum(time)/1000 /* thetime */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
+    from revlog where id between ? and ?""",x,y)
     xthetime = xthetime or 0.01
     xcards = xcards or 0.01
     xfailed = xfailed or 0.01
@@ -359,7 +366,7 @@ def updatePB():
         
     if showNumber:
         if showDebug:
-            if showTwoDay:
+            if showYesterday:
                 if showSuperMatureRetention:
                     if showAgain:
                         if showRetention:
@@ -486,7 +493,7 @@ def updatePB():
                             else:
                                 progressBar.setFormat("%d done     |     %d left     |     %.02f s/card     |     %02d:%02d spent     |     %02d:%02d more     |     ETA %s     |     %.02f New/Lrn Weight     |     %.02f Rev Weight"  % (cards, var_diff,  secspeed, x, y, hrhr, hrmin, ETA, lrnWeight, revWeight))
         else:
-            if showTwoDay:
+            if showYesterday:
                 if showSuperMatureRetention:
                     if showAgain:
                         if showRetention:
@@ -638,15 +645,21 @@ def nmApplyStyle() -> None:
     ''')
 
 def calcProgress(rev: int, lrn: int, new: int) -> int:
+    x = (mw.col.sched.dayCutoff - 86400*2)*1000
+    y = (mw.col.sched.dayCutoff - 86400)*1000
+    
     """Calculate progress using weights and card counts from the sched."""
     # Get studdied cards  and true retention stats
-    xcards, xfailed, xflunked, xpassed = mw.col.db.first("""
+    xcards, xfailed, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
     select
     sum(case when ease >=1 then 1 else 0 end), /* xcards */
     sum(case when ease = 1 then 1 else 0 end), /* xfailed */
     sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
-    sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
-    from revlog where id > ? """,(mw.col.sched.dayCutoff - (86400*2)) * 1000)
+    sum(case when ease > 1 and type == 1 then 1 else 0 end), /* xpassed */
+    sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xpassed_supermature */
+    sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
+    sum(time)/1000 /* thetime */
+    from revlog where id between ? and ?""",x,y)
     xcards = xcards or 0.01
     xfailed = xfailed or 0.01
     xflunked = xflunked or 0.01

@@ -15,6 +15,8 @@ Change the following in reviewer_progress_bar.py<br>
 "showNumber": "True"<br>
 "showRetention": "True"<br>
 "showAgain": "True"<br>
+"showYesterday": "True"<br>
+"showDebug": "False"<br>
 "dockArea": "Qt.TopDockWidgetArea"<br>
 "orientationHV": "Qt.Horizontal"
 "qtxt": "aliceblue",<br>
