@@ -101,6 +101,7 @@ showAgain = 1 # Show again rate or not
 showNumber = 1  # Show the progress text as a fraction
 showYesterday = 1 # Show yesterday's values in parenthesis
 showDebug = 0 # Show New/Lrn/Rev Weights used for computation
+useToday = 0 # Use today's new, lrn, rev weights for computation. 0 = use yesterday's values
 
 qtxt = "aliceblue"  # Percentage color, if text visible.
 qbg = "rgba(0, 0, 0, 0)"  # Background color of progress bar.
@@ -246,7 +247,6 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     return dock
 
 def updatePB():  
-    x = (mw.col.sched.dayCutoff-86400*2)*1000
     y = (mw.col.sched.dayCutoff-86400)*1000
     
     # Get studdied cards  and true retention stats
@@ -337,31 +337,58 @@ def updatePB():
         pbMax += totalCount[node.deck_id]
         pbValue += doneCount[node.deck_id]  
     
-    # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
-    var_diff = int(pbMax - pbValue)
-    progbarmax=var_diff+cards
-    
-    speed   = (cards / max(1, thetime))*60
-    secspeed = max(1, thetime)/max(1, cards)
-    hr = (var_diff / max(1, speed))/60
-    
-    x = math.floor(thetime/3600)
-    y = math.floor((thetime-(x*3600))/60)
-    secs = (thetime-(x*3600))-(y*60)
-    hrhr = math.floor(hr)
-    hrmin = math.floor(60*(hr-hrhr))
-    hrsec = ((hr-hrhr)*60-hrmin)*60
-    
-    dt=datetime.today()
-    tz = 8 #GMT+ <CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)>
-    tzsec = tz*3600
-    
-    t = timedelta(hours = hrhr, minutes = hrmin, seconds = hrsec)
-    left = dt.timestamp()+tzsec+t.total_seconds()
-    
-    date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
-    date_time_24H = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
-    ETA = date_time_24H.strftime("%I:%M %p")  
+    if useToday:
+        # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
+        var_diff = int(pbMax - pbValue)
+        progbarmax=var_diff+cards
+
+        speed   = (cards / max(1, thetime))*60
+        secspeed = max(1, thetime)/max(1, cards)
+        hr = (var_diff / max(1, speed))/60
+
+        x = math.floor(thetime/3600)
+        y = math.floor((thetime-(x*3600))/60)
+        secs = (thetime-(x*3600))-(y*60)
+        hrhr = math.floor(hr)
+        hrmin = math.floor(60*(hr-hrhr))
+        hrsec = ((hr-hrhr)*60-hrmin)*60
+
+        dt=datetime.today()
+        tz = 8 #GMT+ <CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)>
+        tzsec = tz*3600
+
+        t = timedelta(hours = hrhr, minutes = hrmin, seconds = hrsec)
+        left = dt.timestamp()+tzsec+t.total_seconds()
+
+        date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
+        date_time_24H = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
+        ETA = date_time_24H.strftime("%I:%M %p")
+    else:
+        # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
+        var_diff = int(pbMax - pbValue)
+        progbarmax=var_diff+cards
+
+        speed   = (cards / max(1, thetime))*60
+        secspeed = max(1, thetime)/max(1, cards)
+        hr = (var_diff / max(1, speed))/60
+
+        x = math.floor(thetime/3600)
+        y = math.floor((thetime-(x*3600))/60)
+        secs = (thetime-(x*3600))-(y*60)
+        hrhr = math.floor(hr)
+        hrmin = math.floor(60*(hr-hrhr))
+        hrsec = ((hr-hrhr)*60-hrmin)*60
+
+        dt=datetime.today()
+        tz = 8 #GMT+ <CHANGE THIS TO YOUR GMT+_ (negative number if you're GMT-)>
+        tzsec = tz*3600
+
+        t = timedelta(hours = hrhr, minutes = hrmin, seconds = hrsec)
+        left = dt.timestamp()+tzsec+t.total_seconds()
+
+        date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
+        date_time_24H = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
+        ETA = date_time_24H.strftime("%I:%M %p")  
     
     if pbMax == 0:  # 100%
         progressBar.setRange(0, 1)
@@ -651,40 +678,76 @@ def nmApplyStyle() -> None:
     ''')
 
 def calcProgress(rev: int, lrn: int, new: int) -> int:
-    x = (mw.col.sched.dayCutoff - 86400*2)*1000
-    y = (mw.col.sched.dayCutoff - 86400)*1000
-    
-    """Calculate progress using weights and card counts from the sched."""
-    # Get studdied cards  and true retention stats
-    xcards, xfailed, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
-    select
-    sum(case when ease >=1 then 1 else 0 end), /* xcards */
-    sum(case when ease = 1 then 1 else 0 end), /* xfailed */
-    sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
-    sum(case when ease > 1 and type == 1 then 1 else 0 end), /* xpassed */
-    sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xpassed_supermature */
-    sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
-    sum(time)/1000 /* thetime */
-    from revlog where id between ? and ?""",x,y)
-    xcards = xcards or 0.01
-    xfailed = xfailed or 0.01
-    xflunked = xflunked or 0.01
-    xpassed = xpassed or 0.01
-    
-    TR = 1-float(xpassed/(float(xpassed+xflunked)))
-    xagain = float(xfailed/xcards) 
-    lrnWeight = float((1+(1*xagain*lrnSteps))/1)
-    newWeight = float((1+(1*xagain*lrnSteps))/1)
-    revWeight = float((1+(1*TR*lrnSteps))/1)
-    
-    ret = 0
-    if includeRev:
-        ret += rev * revWeight
-    if includeLrn:
-        ret += lrn * lrnWeight
-    if includeNew or (includeNewAfterRevs and rev == 0):
-        ret += new * newWeight
-    return ret
+    if useToday:
+        x = (mw.col.sched.dayCutoff - 86400*2)*1000
+        y = (mw.col.sched.dayCutoff - 86400)*1000
+
+        """Calculate progress using weights and card counts from the sched."""
+        # Get studdied cards  and true retention stats
+        xcards, xfailed, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
+        select
+        sum(case when ease >=1 then 1 else 0 end), /* xcards */
+        sum(case when ease = 1 then 1 else 0 end), /* xfailed */
+        sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
+        sum(case when ease > 1 and type == 1 then 1 else 0 end), /* xpassed */
+        sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xpassed_supermature */
+        sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
+        sum(time)/1000 /* thetime */
+        from revlog where id > ?""",y)
+        xcards = xcards or 0.01
+        xfailed = xfailed or 0.01
+        xflunked = xflunked or 0.01
+        xpassed = xpassed or 0.01
+
+        TR = 1-float(xpassed/(float(xpassed+xflunked)))
+        xagain = float(xfailed/xcards) 
+        lrnWeight = float((1+(1*xagain*lrnSteps))/1)
+        newWeight = float((1+(1*xagain*lrnSteps))/1)
+        revWeight = float((1+(1*TR*lrnSteps))/1)
+
+        ret = 0
+        if includeRev:
+            ret += rev * revWeight
+        if includeLrn:
+            ret += lrn * lrnWeight
+        if includeNew or (includeNewAfterRevs and rev == 0):
+            ret += new * newWeight
+        return ret
+    else:
+        x = (mw.col.sched.dayCutoff - 86400*2)*1000
+        y = (mw.col.sched.dayCutoff - 86400)*1000
+
+        """Calculate progress using weights and card counts from the sched."""
+        # Get studdied cards  and true retention stats
+        xcards, xfailed, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
+        select
+        sum(case when ease >=1 then 1 else 0 end), /* xcards */
+        sum(case when ease = 1 then 1 else 0 end), /* xfailed */
+        sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
+        sum(case when ease > 1 and type == 1 then 1 else 0 end), /* xpassed */
+        sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xpassed_supermature */
+        sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
+        sum(time)/1000 /* thetime */
+        from revlog where id between ? and ?""",x,y)
+        xcards = xcards or 0.01
+        xfailed = xfailed or 0.01
+        xflunked = xflunked or 0.01
+        xpassed = xpassed or 0.01
+
+        TR = 1-float(xpassed/(float(xpassed+xflunked)))
+        xagain = float(xfailed/xcards) 
+        lrnWeight = float((1+(1*xagain*lrnSteps))/1)
+        newWeight = float((1+(1*xagain*lrnSteps))/1)
+        revWeight = float((1+(1*TR*lrnSteps))/1)
+
+        ret = 0
+        if includeRev:
+            ret += rev * revWeight
+        if includeLrn:
+            ret += lrn * lrnWeight
+        if includeNew or (includeNewAfterRevs and rev == 0):
+            ret += new * newWeight
+        return ret
 
 def updateCountsForAllDecks(updateTotal: bool) -> None:
     """
