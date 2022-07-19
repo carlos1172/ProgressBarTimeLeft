@@ -250,7 +250,7 @@ def updatePB():
     y = (mw.col.sched.dayCutoff-86400)*1000
     
     # Get studdied cards  and true retention stats
-    cards, failed, flunked, passed, passed_supermature, flunked_supermature, learned, relearned, thetime = mw.col.db.first("""
+    cards, failed, flunked, passed, passed_supermature, flunked_supermature, thetime = mw.col.db.first("""
     select
     sum(case when ease >=1 then 1 else 0 end), /* cards */
     sum(case when ease = 1 then 1 else 0 end), /* failed */
@@ -258,8 +258,6 @@ def updatePB():
     sum(case when ease > 1 and type == 1 then 1 else 0 end), /* passed */
     sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* passed_supermature */
     sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* flunked_supermature */
-    sum(case when ivl > 0 and type == 0 then 1 else 0 end), /* learned */
-    sum(case when ivl > 0 and type == 2 then 1 else 0 end), /* relearned */
     sum(time)/1000 /* thetime */
     from revlog where id > ? """,y)
     cards = cards or 0
@@ -268,8 +266,6 @@ def updatePB():
     passed = passed or 0
     passed_supermature = passed_supermature or 0
     flunked_supermature = flunked_supermature or 0
-    learned = learned or 0
-    relearned = relearned or 0
     thetime = thetime or 0
     try:
         temp = "%0.1f%%" %(passed/float(passed+flunked)*100)
@@ -679,20 +675,16 @@ def nmApplyStyle() -> None:
 
 def calcProgress(rev: int, lrn: int, new: int) -> int:
     if useToday:
-        x = (mw.col.sched.dayCutoff - 86400*2)*1000
         y = (mw.col.sched.dayCutoff - 86400)*1000
 
         """Calculate progress using weights and card counts from the sched."""
         # Get studdied cards  and true retention stats
-        xcards, xfailed, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
+        xcards, xfailed, xflunked, xpassed = mw.col.db.first("""
         select
         sum(case when ease >=1 then 1 else 0 end), /* xcards */
         sum(case when ease = 1 then 1 else 0 end), /* xfailed */
         sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
-        sum(case when ease > 1 and type == 1 then 1 else 0 end), /* xpassed */
-        sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xpassed_supermature */
-        sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
-        sum(time)/1000 /* thetime */
+        sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
         from revlog where id > ?""",y)
         xcards = xcards or 0.01
         xfailed = xfailed or 0.01
@@ -719,15 +711,12 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
 
         """Calculate progress using weights and card counts from the sched."""
         # Get studdied cards  and true retention stats
-        xcards, xfailed, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
+        xcards, xfailed, xflunked, xpassed = mw.col.db.first("""
         select
         sum(case when ease >=1 then 1 else 0 end), /* xcards */
         sum(case when ease = 1 then 1 else 0 end), /* xfailed */
         sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
-        sum(case when ease > 1 and type == 1 then 1 else 0 end), /* xpassed */
-        sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xpassed_supermature */
-        sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
-        sum(time)/1000 /* thetime */
+        sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
         from revlog where id between ? and ?""",x,y)
         xcards = xcards or 0.01
         xfailed = xfailed or 0.01
