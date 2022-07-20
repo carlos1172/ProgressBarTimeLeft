@@ -28,9 +28,9 @@ Change the following in reviewer_progress_bar.py<br>
 "showAgain": "True"<br>
 "showYesterday": "True"<br>
 "showDebug": "False"<br>
-"useToday": "False"<br> # DEFAULT: 0 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA.
-"useAverage": "True"<br> # DEFAULT: 1 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA.
-"useYesterday": "False"<br> # DEFAULT: 0 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA.
+"useToday": "False" # DEFAULT: 0 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA. <br> 
+"useAverage": "True" # DEFAULT: 1 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA. <br> 
+"useYesterday": "False" # DEFAULT: 0 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA. <br> 
 "dockArea": "Qt.TopDockWidgetArea"<br>
 "orientationHV": "Qt.Horizontal"
 "qtxt": "aliceblue",<br>
