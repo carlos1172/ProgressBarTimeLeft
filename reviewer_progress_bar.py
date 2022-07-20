@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Anki Add-on: Progress Bar
-
 Shows progress in the Reviewer in terms of passed cards per session.
-
 Copyright:  (c) Unknown author (nest0r/Ja-Dark?) 2017
             (c) SebastienGllmt 2017 <https://github.com/SebastienGllmt/>
             (c) liuzikai 2018-2020 <https://github.com/liuzikai>
@@ -299,13 +297,13 @@ def updatePB():
     sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end), /* xflunked_supermature */
     sum(time)/1000 /* xthetime */
     from revlog where id between ? and ?""",x,y)
-    xthetime = xthetime or 0.01
-    xcards = xcards or 0.01
-    xfailed = xfailed or 0.01
-    xflunked = xflunked or 0.01
-    xpassed = xpassed or 0.01
-    xpassed_supermature = xpassed_supermature or 0.01
-    xflunked_supermature = xflunked_supermature or 0.01
+    xthetime = xthetime or 0
+    xcards = xcards or 0
+    xfailed = xfailed or 0
+    xflunked = xflunked or 0
+    xpassed = xpassed or 0
+    xpassed_supermature = xpassed_supermature or 0
+    xflunked_supermature = xflunked_supermature or 0
 
     xsecspeed = max(1, xthetime)/max(1, xcards)
 
@@ -330,22 +328,22 @@ def updatePB():
     sum(case when ease = 1 and type == 1 then 1 else 0 end), /* yflunked */
     sum(case when ease > 1 and type == 1 then 1 else 0 end) /* ypassed */
     from revlog where id > ? """,x)
-    ycards = ycards or 0.01
-    yfailed = yfailed or 0.01
-    yflunked = yflunked or 0.01
-    ypassed = ypassed or 0.01
+    ycards = ycards or 0
+    yfailed = yfailed or 0
+    yflunked = yflunked or 0
+    ypassed = ypassed or 0
     
     # YESTERDAY'S VALUES
-    zTR = 1-float(xpassed/(float(xpassed+xflunked)))
-    zagain = float(xfailed/xcards)
+    zTR = 1-float(xpassed/(float((max(1,xpassed+xflunked)))))
+    zagain = float(xfailed/max(1,xcards))
     
     # TWO DAY AVERAGE VALUES
-    yTR = 1-float(ypassed/(float(ypassed+yflunked)))
-    xagain = float(yfailed/ycards)
+    yTR = 1-float(ypassed/(float(max(1,ypassed+yflunked))))
+    xagain = float(yfailed/max(1,ycards))
     
     # TODAY'S VALUES
-    xTR = 1-float(passed/(float(passed+flunked)))
-    yagain = float(failed/cards)
+    xTR = 1-float(passed/(float(max(1,passed+flunked))))
+    yagain = float(failed/max(1,cards))
     
     # TODAY'S VALUES
     xlrnWeight = float((1+(1*yagain*lrnSteps))/1)
@@ -695,13 +693,13 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
         sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
         sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
         from revlog where id > ?""",y)
-        xcards = xcards or 0.01
-        xfailed = xfailed or 0.01
-        xflunked = xflunked or 0.01
-        xpassed = xpassed or 0.01
+        xcards = xcards or 0
+        xfailed = xfailed or 0
+        xflunked = xflunked or 0
+        xpassed = xpassed or 0
 
-        TR = 1-float(xpassed/(float(xpassed+xflunked)))
-        xagain = float(xfailed/xcards) 
+        TR = 1-float(xpassed/(float(max(1,xpassed+xflunked))))
+        xagain = float(xfailed/max(1,xcards))
         lrnWeight = float((1+(1*xagain*lrnSteps))/1)
         newWeight = float((1+(1*xagain*lrnSteps))/1)
         revWeight = float((1+(1*TR*lrnSteps))/1)
@@ -726,13 +724,13 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
         sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
         sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
         from revlog where id > ?""",x)
-        xcards = xcards or 0.01
-        xfailed = xfailed or 0.01
-        xflunked = xflunked or 0.01
-        xpassed = xpassed or 0.01
+        xcards = xcards or 0
+        xfailed = xfailed or 0
+        xflunked = xflunked or 0
+        xpassed = xpassed or 0
 
-        TR = 1-float(xpassed/(float(xpassed+xflunked)))
-        xagain = float(xfailed/xcards) 
+        TR = 1-float(xpassed/(float(max(1,xpassed+xflunked))))
+        xagain = float(xfailed/(max(1,xcards)))
         lrnWeight = float((1+(1*xagain*lrnSteps))/1)
         newWeight = float((1+(1*xagain*lrnSteps))/1)
         revWeight = float((1+(1*TR*lrnSteps))/1)
@@ -758,13 +756,13 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
         sum(case when ease = 1 and type == 1 then 1 else 0 end), /* xflunked */
         sum(case when ease > 1 and type == 1 then 1 else 0 end) /* xpassed */
         from revlog where id between ? and ?""",x,y)
-        xcards = xcards or 0.01
-        xfailed = xfailed or 0.01
-        xflunked = xflunked or 0.01
-        xpassed = xpassed or 0.01
+        xcards = xcards or 0
+        xfailed = xfailed or 0
+        xflunked = xflunked or 0
+        xpassed = xpassed or 0
 
-        TR = 1-float(xpassed/(float(xpassed+xflunked)))
-        xagain = float(xfailed/xcards) 
+        TR = 1-float(xpassed/(float(max(1,xpassed+xflunked))))
+        xagain = float(xfailed/max(1,xcards))
         lrnWeight = float((1+(1*xagain*lrnSteps))/1)
         newWeight = float((1+(1*xagain*lrnSteps))/1)
         revWeight = float((1+(1*TR*lrnSteps))/1)
@@ -781,20 +779,16 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
 def updateCountsForAllDecks(updateTotal: bool) -> None:
     """
     Update counts.
-
     After adding, editing or deleting cards (afterStateChange hook), updateTotal should be set to True to update
     totalCount[] based on doneCount[] and remainCount[]. No card should have been answered before this hook is
     triggered, so the change in remainCount[] should be caused by editing collection and therefore goes into
     totalCount[].
-
     When the user answer a card (showQuestion hook), updateTotal should be set to False to update doneCount[] based on
     totalCount[] and remainCount[]. No change to collection should have been made before this hook is
     triggered, so the change in remainCount[] should be caused by answering cards and therefore goes into
     doneCount[].
-
     In the later case, remainCount[] may still increase based on the weights of New, Lrn and Rev cards (see comments
     of "Calculation weights" above), in which case totalCount[] may still get updated based on forceForward setting.
-
     :param updateTotal: True for afterStateChange hook, False for showQuestion hook
     """
 
@@ -886,4 +880,4 @@ if anki_version.startswith("2.0.x"):
     EditCurrent.onReset = wrap(
         EditCurrent.onReset, changeStylesheet, "after")
     EditCurrent.onSave = wrap(
-        EditCurrent.onSave, changeStylesheet, "after")
+        EditCurrent.onSave, changeStylesheet, "afterwards")
