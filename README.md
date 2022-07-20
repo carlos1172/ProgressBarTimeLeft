@@ -28,6 +28,9 @@ Change the following in reviewer_progress_bar.py<br>
 "showAgain": "True"<br>
 "showYesterday": "True"<br>
 "showDebug": "False"<br>
+"useToday": "False"<br> # DEFAULT: 0 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA.
+"useAverage": "True"<br> # DEFAULT: 1 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA.
+"useYesterday": "False"<br> # DEFAULT: 0 WARNING: useToday, useAverage, and useYesterday cannot be used at the same time. CHOOSE ONLY ONE. Uses today's lrn/rev/new weights for ETA.
 "dockArea": "Qt.TopDockWidgetArea"<br>
 "orientationHV": "Qt.Horizontal"
 "qtxt": "aliceblue",<br>
