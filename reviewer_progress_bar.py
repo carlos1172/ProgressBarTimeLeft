@@ -113,12 +113,12 @@ maxWidth = 20  # (e.g. "5px". default: "")
 
 scrollingBarWhenEditing = 1  # Make the progress bar 'scrolling' when waiting to resume.
 
-orientationHV = Qt.Horizontal  # Show bar horizontally (side to side). Use with top/bottom dockArea.
+orientationHV = Qt.Orientation.Horizontal  # Show bar horizontally (side to side). Use with top/bottom dockArea.
 # orientationHV = Qt.Vertical # Show bar vertically (up and down). Use with right/left dockArea.
 
 invertTF = 0  # If set to True, inverts and goes from right to left or top to bottom.
 
-dockArea = Qt.TopDockWidgetArea # Shows bar at the top. Use with horizontal orientation.
+dockArea = Qt.DockWidgetArea.TopDockWidgetArea # Shows bar at the top. Use with horizontal orientation.
 # dockArea = Qt.BottomDockWidgetArea # Shows bar at the bottom. Use with horizontal orientation.
 # dockArea = Qt.RightDockWidgetArea # Shows bar at right. Use with vertical orientation.
 # dockArea = Qt.LeftDockWidgetArea # Shows bar at left. Use with vertical orientation.
@@ -151,14 +151,14 @@ pbdStyle = QStyleFactory.create("%s" % pbStyle)  # Don't touch.
 
 # Defining palette in case needed for custom colors with themes.
 palette = QPalette()
-palette.setColor(QPalette.Base, QColor(qbg))
-palette.setColor(QPalette.Highlight, QColor(qfg))
-palette.setColor(QPalette.Button, QColor(qbg))
-palette.setColor(QPalette.WindowText, QColor(qtxt))
-palette.setColor(QPalette.Window, QColor(qbg))
+palette.setColor(QPalette.ColorRole.Base, QColor(qbg))
+palette.setColor(QPalette.ColorRole.Highlight, QColor(qfg))
+palette.setColor(QPalette.ColorRole.Button, QColor(qbg))
+palette.setColor(QPalette.ColorRole.WindowText, QColor(qtxt))
+palette.setColor(QPalette.ColorRole.Window, QColor(qbg))
 
 if maxWidth:
-    if orientationHV == Qt.Horizontal:
+    if orientationHV == Qt.Orientation.Horizontal:
         restrictSize = "max-height: %s;" % maxWidth
     else:
         restrictSize = "max-width: %s;" % maxWidth
@@ -233,10 +233,10 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     if len(existing_widgets) > 0:
         mw.setDockNestingEnabled(True)
 
-        if dockArea == Qt.TopDockWidgetArea or dockArea == Qt.BottomDockWidgetArea:
+        if dockArea == Qt.DockWidgetArea.TopDockWidgetArea or dockArea == Qt.BottomDockWidgetArea:
             stack_method = Qt.Vertical
         if dockArea == Qt.LeftDockWidgetArea or dockArea == Qt.RightDockWidgetArea:
-            stack_method = Qt.Horizontal
+            stack_method = Qt.Orientation.Horizontal
         mw.splitDockWidget(existing_widgets[0], dock, stack_method)
 
     if qbr > 0 or pbdStyle is not None:
@@ -249,7 +249,7 @@ def _dock(pb: QProgressBar) -> QDockWidget:
 def updatePB():
     # Get studdied cards  and true retention stats. TODAY'S VALUES
     
-    y = (mw.col.sched.dayCutoff-86400)*1000
+    y = (mw.col.sched.day_cutoff-86400)*1000
     
     cards, failed, distinct, flunked, passed, passed_supermature, flunked_supermature, learned, relearned, thetime = mw.col.db.first("""
     select
@@ -290,8 +290,8 @@ def updatePB():
     """Calculate progress using weights and card counts from the sched."""
     # Get studdied cards  and true retention stats. YESTERDAY'S VALUES
     
-    x = (mw.col.sched.dayCutoff - 86400*2)*1000
-    y = (mw.col.sched.dayCutoff - 86400)*1000
+    x = (mw.col.sched.day_cutoff - 86400*2)*1000
+    y = (mw.col.sched.day_cutoff - 86400)*1000
     
     xcards, xfailed, xdistinct, xflunked, xpassed, xpassed_supermature, xflunked_supermature, xthetime = mw.col.db.first("""
     select
@@ -327,7 +327,7 @@ def updatePB():
     """Calculate progress using weights and card counts from the sched."""
     # Get studdied cards  and true retention stats. TWO DAY AVERAGE VALUES
     
-    x = (mw.col.sched.dayCutoff - 86400*2)*1000
+    x = (mw.col.sched.day_cutoff - 86400*2)*1000
     
     ycards, yfailed, ydistinct, yflunked, ypassed = mw.col.db.first("""
     select
@@ -692,7 +692,7 @@ def nmApplyStyle() -> None:
 
 def calcProgress(rev: int, lrn: int, new: int) -> int:
     if useToday:
-        y = (mw.col.sched.dayCutoff - 86400)*1000
+        y = (mw.col.sched.day_cutoff - 86400)*1000
 
         """Calculate progress using weights and card counts from the sched."""
         # Get studdied cards  and true retention stats
@@ -725,7 +725,7 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
             ret += new * newWeight
         return ret
     if useAverage:
-        x = (mw.col.sched.dayCutoff - 86400*2)*1000
+        x = (mw.col.sched.day_cutoff - 86400*2)*1000
 
         """Calculate progress using weights and card counts from the sched."""
         # Get studdied cards  and true retention stats
@@ -758,8 +758,8 @@ def calcProgress(rev: int, lrn: int, new: int) -> int:
             ret += new * newWeight
         return ret
     if useYesterday:     
-        x = (mw.col.sched.dayCutoff - 86400*2)*1000
-        y = (mw.col.sched.dayCutoff - 86400)*1000
+        x = (mw.col.sched.day_cutoff - 86400*2)*1000
+        y = (mw.col.sched.day_cutoff - 86400)*1000
 
         """Calculate progress using weights and card counts from the sched."""
         # Get studdied cards  and true retention stats
