@@ -174,10 +174,10 @@ def add_info():
                 select
                 sum(case when ease >=1 then 1 else 0 end), /* xcards */
                 sum(case when ease = 1 then 1 else 0 end), /* xfailed */
-                sum(case when ease = 1 and type == 0 or 2 then 1 else 0 end), /* xlearn agains */
-                sum(case when ease > 1 and type == 0 or 2 then 1 else 0 end), /* xlearn pass */
-                sum(case when ease = 1 and type == 1 then 1 else 0 end), /* x_flunked */
-                sum(case when ease > 1 and type == 1 then 1 else 0 end) /* x_passed */
+                sum(case when ease = 1 and type in (0, 2) and type != 1 and type != 3 then 1 else 0 end), /* xlearn agains */
+                sum(case when ease > 1 and type in (0, 2) and type != 1 and type != 3 then 1 else 0 end), /* xlearn pass */
+                sum(case when ease = 1 and type in (1, 3) and type != 0 and type != 2 then 1 else 0 end), /* x_flunked */
+                sum(case when ease > 1 and type in (1, 3) and type != 0 and type != 2 then 1 else 0 end) /* x_passed */
                 from revlog where id between ? and ?""", x, y)
     x_cards = x_cards or 0
     x_failed = x_failed or 0
