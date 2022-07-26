@@ -405,7 +405,7 @@ def updatePB():
         pbValue += doneCount[node.deck_id]
 
         # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
-    var_diff = int(pbMax - pbValue)
+    var_diff = pbMax - pbValue
     progbarmax = var_diff + cards
 
     speed = (cards / max(1, thetime)) * 60
@@ -896,7 +896,7 @@ def nmApplyStyle() -> None:
     }
     ''')
 
-def calcProgress(rev: int, lrn: int, new: int) -> int:
+def calcProgress(rev: float, lrn: float, new: float) -> float:
     ret = 0
     if includeRev:
         ret += rev * rev_weight
@@ -937,7 +937,7 @@ def updateCountsForTree(node, updateTotal: bool) -> None:
         updateCountsForTree(child, updateTotal)
 
 
-def updateCountsForDeck(did: int, remain: int, updateTotal: bool):
+def updateCountsForDeck(did: float, remain: float, updateTotal: bool):
     if did not in totalCount.keys():
         totalCount[did] = remainCount[did] = remain
         doneCount[did] = 0
