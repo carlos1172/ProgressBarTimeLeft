@@ -854,6 +854,9 @@ def afterStateChangeCallBack(state: str, oldState: str) -> None:
             initPB()
             updateCountsForAllDecks(True)
         currDID = None
+    elif state == "profileManager":
+        # fixes the issue with multiple profiles
+        return
     else:  # "overview" or "review"
         # showInfo("mw.col.decks.current()['id'])= %d" % mw.col.decks.current()['id'])
         currDID = mw.col.decks.current()['id']
