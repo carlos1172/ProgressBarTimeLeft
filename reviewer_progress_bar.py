@@ -79,7 +79,7 @@ show_retention = config['show_retention']  # DEFAULT: 1 Show the retention or no
 show_super_mature_retention = config['show_super_mature_retention']  # DEFAULT: 1 Show Super Mature Retention
 show_again = config['show_again']  # DEFAULT: 1 Show again rate or not
 show_number = config['show_number']  # DEFAULT: 1 Show the progress text as a fraction
-show_yesterday = config['show_yesterday']  # DEFAULT: 1 Show yesterday's values in parenthesis
+show_yesterday = config['show_yesterday']  # DEFAULT: 1 Show yesterday's values in parentheses
 show_debug = config['show_debug']  # DEFAULT: 0 Show New/Lrn/Rev Weights used for computation
 
 qtxt = "aliceblue"  # Percentage color, if text visible.
@@ -98,9 +98,9 @@ orientationHV = Qt.Orientation.Horizontal  # Show bar horizontally (side to side
 invertTF = 0  # If set to True, inverts and goes from right to left or top to bottom.
 
 dockArea = Qt.DockWidgetArea.TopDockWidgetArea  # Shows bar at the top. Use with horizontal orientation.
-# dockArea = Qt.BottomDockWidgetArea # Shows bar at the bottom. Use with horizontal orientation.
-# dockArea = Qt.RightDockWidgetArea # Shows bar at right. Use with vertical orientation.
-# dockArea = Qt.LeftDockWidgetArea # Shows bar at left. Use with vertical orientation.
+# dockArea = Qt.DockWidgetArea.BottomDockWidgetArea # Shows bar at the bottom. Use with horizontal orientation.
+# dockArea = Qt.DockWidgetArea.RightDockWidgetArea # Shows bar at right. Use with vertical orientation.
+# dockArea = Qt.DockWidgetArea.LeftDockWidgetArea # Shows bar at left. Use with vertical orientation.
 
 pbStyle = ""  # Stylesheet used only if blank. Else uses QPalette + theme style.
 '''pbStyle options (insert a quoted word above):
@@ -242,7 +242,7 @@ def _dock(pb: QProgressBar) -> QDockWidget:
     dock.setWidget(pb)
     dock.setTitleBarWidget(tWidget)
 
-    # Note: if there is another widget already in this dock position, we have to add ourself to the list
+    # Note: if there is another widget already in this dock position, we have to add ourselves to the list
 
     # first check existing widgets
     existing_widgets = [widget for widget in mw.findChildren(QDockWidget) if mw.dockWidgetArea(widget) == dockArea]
@@ -291,15 +291,15 @@ def updatePB():
     flunked_supermature = flunked_supermature or 0
     thetime = thetime or 0
     try:
-        temp = "%0.1f%%" % (passed / float(passed + flunked) * 100)
+        temp = "%0.2f%%" % (passed / float(passed + flunked) * 100)
     except ZeroDivisionError:
         temp = "N/A"
     try:
-        temp_supermature = "%0.1f%%" % (passed_supermature / float(passed_supermature + flunked_supermature) * 100)
+        temp_supermature = "%0.2f%%" % (passed_supermature / float(passed_supermature + flunked_supermature) * 100)
     except ZeroDivisionError:
         temp_supermature = "N/A"
     try:
-        again = "%0.1f%%" % ((failed / cards) * 100)
+        again = "%0.2f%%" % ((failed / cards) * 100)
     except ZeroDivisionError:
         again = "N/A"
 
@@ -330,11 +330,11 @@ def updatePB():
     xsecspeed = max(1, xthetime) / max(1, xcards)
 
     try:
-        xtemp = "%0.1f%%" % (xpassed / float(xpassed + xflunked) * 100)
+        xtemp = "%0.2f%%" % (xpassed / float(xpassed + xflunked) * 100)
     except ZeroDivisionError:
         xtemp = "N/A"
     try:
-        xtemp_supermature = "%0.1f%%" % (xpassed_supermature / float(xpassed_supermature + xflunked_supermature) * 100)
+        xtemp_supermature = "%0.2f%%" % (xpassed_supermature / float(xpassed_supermature + xflunked_supermature) * 100)
     except ZeroDivisionError:
         xtemp_supermature = "N/A"
 
@@ -356,19 +356,19 @@ def updatePB():
     yfailed = yfailed or 0
     yflunked = yflunked or 0
     ypassed = ypassed or 0
-    ypassed_supermature or ypassed_supermature or 0
+    ypassed_supermature = ypassed_supermature or 0
     yflunked_supermature = yflunked_supermature or 0
 
     try:
-        ytemp = "%0.1f%%" % (ypassed / float(ypassed + yflunked) * 100)
+        ytemp = "%0.2f%%" % (ypassed / float(ypassed + yflunked) * 100)
     except ZeroDivisionError:
         ytemp = "N/A"
     try:
-        ytemp_supermature = "%0.1f%%" % (ypassed_supermature / float(ypassed_supermature + yflunked_supermature) * 100)
+        ytemp_supermature = "%0.2f%%" % (ypassed_supermature / float(ypassed_supermature + yflunked_supermature) * 100)
     except ZeroDivisionError:
         ytemp_supermature = "N/A"
     try:
-        y_again = "%0.1f%%" % ((yfailed / ycards) * 100)
+        y_again = "%0.2f%%" % ((yfailed / ycards) * 100)
     except ZeroDivisionError:
         y_again = "N/A"
 
@@ -948,7 +948,7 @@ def updateCountsForDeck(did: int, remain: int, updateTotal: bool):
         else:
             if remainCount[did] + doneCount[did] > totalCount[did]:
                 # This may happen if you press 'again' followed by 'good' for a new card, as stated in comments
-                # "Calculation weights,' or when you undo a card, making remaining count increases.
+                # 'Calculation weights,' or when you undo a card, making remaining count increases.
 
                 if forceForward:
                     pass  # give up changing counts, until the remainCount decrease.
