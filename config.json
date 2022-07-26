@@ -1,1 +1,12 @@
-{}
+{
+    "lrn_steps": 2,
+    "no_days": 7,
+    "show_debug": 0,
+    "tz": 8,
+    "show_percent": 1,
+    "show_retention": 1,
+    "show_super_mature_retention": 1,
+    "show_again": 1,
+    "show_number": 1,
+    "show_yesterday": 1
+}
