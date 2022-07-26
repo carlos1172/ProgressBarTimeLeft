@@ -339,9 +339,9 @@ def updatePB():
         xtemp_supermature = "N/A"
 
     """Calculate progress using weights and card counts from the sched."""
-    # Get studdied cards  and true retention stats. TWO DAY AVERAGE VALUES
+    # Get studdied cards  and true retention stats. AVERAGE VALUES
 
-    x = (mw.col.sched.day_cutoff - 86400 * 2) * 1000
+    x = (mw.col.sched.day_cutoff - 86400 * no_days) * 1000
 
     ycards, yfailed, yflunked, ypassed = mw.col.db.first("""
     select
@@ -359,7 +359,7 @@ def updatePB():
     zTR = 1 - float(xpassed / (float((max(1, xpassed + xflunked)))))
     zagain = float(xfailed / max(1, (xcards - xpassed)))
 
-    # TWO DAY AVERAGE VALUES
+    # AVERAGE VALUES
     yTR = 1 - float(ypassed / (float(max(1, ypassed + yflunked))))
     xagain = float(yfailed / max(1, (ycards - ypassed)))
 
@@ -375,7 +375,7 @@ def updatePB():
     lrnWeight = float((1 + (1 * zagain * lrn_steps)) / 1)
     revWeight = float((1 + (1 * zTR * lrn_steps)) / 1)
 
-    # TWO DAY AVERAGE VALUES
+    # AVERAGE VALUES
     ylrnWeight = float((1 + (1 * xagain * lrn_steps)) / 1)
     yrevWeight = float((1 + (1 * yTR * lrn_steps)) / 1)
 
@@ -877,7 +877,6 @@ def nmApplyStyle() -> None:
         height: 0px;
     }
     ''')
-
 
 def calcProgress(rev: int, lrn: int, new: int) -> int:
     ret = 0
