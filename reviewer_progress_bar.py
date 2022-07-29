@@ -892,7 +892,7 @@ def nmApplyStyle() -> None:
     }
     ''')
 
-def calcProgress(rev: float, lrn: float, new: float) -> float:
+def calcProgress(rev: int, lrn: int, new: int) -> int:
     ret = 0
     if includeRev:
         ret += rev * rev_weight
@@ -933,7 +933,7 @@ def updateCountsForTree(node, updateTotal: bool) -> None:
         updateCountsForTree(child, updateTotal)
 
 
-def updateCountsForDeck(did: float, remain: float, updateTotal: bool):
+def updateCountsForDeck(did: int, remain: int, updateTotal: bool):
     if did not in totalCount.keys():
         totalCount[did] = remainCount[did] = remain
         doneCount[did] = 0
