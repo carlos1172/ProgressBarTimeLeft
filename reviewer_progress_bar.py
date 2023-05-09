@@ -347,7 +347,7 @@ def updatePB():
 
         # showInfo("pbMax = %d, pbValue = %d" % (pbMax, pbValue))
     var_diff = pbMax - pbValue
-    progbarmax = var_diff + cards
+    progbarmax = int(var_diff + cards)
 
     speed = (cards / max(1, thetime)) * 60
     secspeed = max(1, thetime) / max(1, cards)
