@@ -358,20 +358,20 @@ def updatePB():
 
     speed = (cards / max(1, thetime)) * 60
     secspeed = max(1, thetime) / max(1, cards)
-    completeionTime_hr_Decimal = (var_diff / max(1, speed)) / 60
+    hr = (var_diff / max(1, speed)) / 60
 
     x = math.floor(thetime / 3600)
     y = math.floor((thetime - (x * 3600)) / 60)
 
-    completeionTime_hr_Int = math.floor(completeionTime_hr_Decimal)
-    completeionTime_min_Int = math.floor(60 * (completeionTime_hr_Decimal - completeionTime_hr_Int))
-    completeionTime_sec_Int = ((completeionTime_hr_Decimal - completeionTime_hr_Int) * 60 - completeionTime_min_Int) * 60
+    hrhr = math.floor(hr)
+    hrmin = math.floor(60 * (hr - hrhr))
+    hrsec = ((hr - hrhr) * 60 - hrmin) * 60
 
     dt = datetime.today()
 
     tzsec = tz * 3600
 
-    t = timedelta(hours=completeionTime_hr_Int, minutes=completeionTime_min_Int, seconds=completeionTime_sec_Int)
+    t = timedelta(hours=hrhr, minutes=hrmin, seconds=hrsec)
     left = dt.timestamp() + tzsec + t.total_seconds()
 
     date_time = datetime.utcfromtimestamp(left).strftime('%Y-%m-%d %H:%M:%S')
@@ -418,8 +418,8 @@ def updatePB():
                 output += f"     |     {temp_supermature} SMTR"               
         if True==True:
             output += f"     |     {x:02d}:{y:02d} spent"
-            output += f"     |     {completeionTime_hr_Int:02d}:{completeionTime_min_Int:02d} more"
-            ETA = f"{ETA}+1" if completeionTime_hr_Int >= 24 else ETA
+            output += f"     |     {hrhr:02d}:{hrmin:02d} more"
+            ETA = f"{ETA}+1" if hrhr >= 24 else ETA
             output += f"     |     ETA {ETA}"
         if show_debug:
             output += f"     |     {new_weight:.02f} New Weight"
