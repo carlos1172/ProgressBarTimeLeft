@@ -580,3 +580,25 @@ if anki_version.startswith("2.0.x"):
         EditCurrent.onReset, changeStylesheet, "after")
     EditCurrent.onSave = wrap(
         EditCurrent.onSave, changeStylesheet, "afterwards")
+    
+# Define a function to toggle the visibility of the progress bar
+def toggleProgressBar():
+    global progressBar
+    if progressBar.isVisible():
+        progressBar.hide()
+    else:
+        progressBar.show()
+
+# Create a QAction object
+action = QAction("Toggle Progress Bar", mw)
+
+# Set the shortcut for the action to Ctrl+G
+toggle_sc = config['toggle_shortcut']
+shortcut = QKeySequence(toggle_sc)  # Customize the shortcut as needed
+action.setShortcut(shortcut)
+
+# Connect the action to the toggleProgressBar function
+action.triggered.connect(toggleProgressBar)
+
+# Add the action to the menuTools menu
+mw.form.menuTools.addAction(action)
