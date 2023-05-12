@@ -21,7 +21,7 @@ config = mw.addonManager.getConfig(__name__)
 # CARD TALLY CALCULATION
 
 # Which queues to include in the progress calculation (all True by default)
-includeNew = 1
+includeNew = 0
 includeRev = 1
 includeLrn = 1
 
@@ -189,6 +189,7 @@ def add_info():
 
     """Calculate progress using weights and card counts from the sched."""
 
+    #retention rate for review cards
     tr = (float(x_flunked / (float(max(1, x_passed + x_flunked)))))
 
     x_learn_agains = float(x_learn / max(1, (x_learn + x_learn_pass)))
@@ -455,6 +456,7 @@ def nmApplyStyle() -> None:
     }
     ''')
 
+#used to calculate var_diff
 def calcProgress(rev: int, lrn: int, new: int) -> int:
     ret = 0
     if includeRev:
@@ -578,3 +580,25 @@ if anki_version.startswith("2.0.x"):
         EditCurrent.onReset, changeStylesheet, "after")
     EditCurrent.onSave = wrap(
         EditCurrent.onSave, changeStylesheet, "afterwards")
+    
+# Define a function to toggle the visibility of the progress bar
+def toggleProgressBar():
+    global progressBar
+    if progressBar.isVisible():
+        progressBar.hide()
+    else:
+        progressBar.show()
+
+# Create a QAction object
+action = QAction("Toggle Progress Bar", mw)
+
+# Set the shortcut for the action to Ctrl+G
+toggle_sc = config['toggle_shortcut']
+shortcut = QKeySequence(toggle_sc)  # Customize the shortcut as needed
+action.setShortcut(shortcut)
+
+# Connect the action to the toggleProgressBar function
+action.triggered.connect(toggleProgressBar)
+
+# Add the action to the menuTools menu
+mw.form.menuTools.addAction(action)
