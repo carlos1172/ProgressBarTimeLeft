@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from typing import Optional
+from .night_mode import isnightmode
 
 from anki.hooks import addHook, wrap
 from anki import version as anki_version
@@ -74,10 +75,18 @@ show_number = config['show_number']  # DEFAULT: 1 Show the progress text as a fr
 show_yesterday = config['show_yesterday']  # DEFAULT: 1 Show yesterday's values in parentheses
 show_debug = config['show_debug']  # DEFAULT: 0 Show New/Lrn/Rev Weights used for computation
 
-qtxt = "aliceblue"  # Percentage color, if text visible.
-qbg = "rgba(0, 0, 0, 0)"  # Background color of progress bar.
-qfg = "#3399cc"  # Foreground color of progress bar.
-qbr = 5  # Border radius (> 0 for rounded corners).
+if isnightmode():
+    qtxt = "aliceblue"  # Percentage color, if text visible.
+    qbg = "rgba(39, 40, 40, 1)"  # Background color of progress bar.
+    qfg = "#3399cc"  # Foreground color of progress bar.
+    qbr = 0  # Border radius (> 0 for rounded corners).
+    qtr = 0  # Border radius (> 0 for rounded corners).
+else:
+    qtxt = "black"  # Percentage color, if text visible.
+    qbg = "rgba(228, 228, 228, 1)"  # Background color of progress bar.
+    qfg = "#3399cc"  # Foreground color of progress bar.
+    qbr = 0  # Border radius (> 0 for rounded corners).
+    qtr = 0  # Border radius (> 0 for rounded corners).
 
 # optionally restricts progress bar width
 maxWidth = 20  # (e.g. "5px". default: "")
