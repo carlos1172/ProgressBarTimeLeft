@@ -602,7 +602,7 @@ def toggleProgressBar():
 action = QAction("Toggle Progress Bar", mw)
 
 # Set the shortcut for the action to Ctrl+G
-toggle_sc = config['toggle_shortcut']
+toggle_sc = config.get('toggle_shortcut', 'Ctrl+G')
 shortcut = QKeySequence(toggle_sc)  # Customize the shortcut as needed
 action.setShortcut(shortcut)
 
