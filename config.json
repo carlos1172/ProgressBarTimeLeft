@@ -8,5 +8,6 @@
     "show_super_mature_retention": 1,
     "show_again": 1,
     "show_number": 1,
-    "show_yesterday": 1
+    "show_yesterday": 1,
+    "toggle_shortcut": "Ctrl+G"
 }
