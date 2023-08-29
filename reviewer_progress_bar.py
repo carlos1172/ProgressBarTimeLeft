@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from typing import Optional
-from .night_mode import isnightmode
+from .nightmode import isnightmode
 
 from anki.hooks import addHook, wrap
 from anki import version as anki_version
